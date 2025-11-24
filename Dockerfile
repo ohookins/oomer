@@ -8,7 +8,7 @@ RUN apk add --no-cache gcc libc-dev
 COPY main.c .
 
 # Compile the C program
-RUN gcc -O0 -o oomer main.c
+RUN gcc -static -O0 -o oomer main.c
 
 # Set the entrypoint for the container
 CMD ["./oomer"]
