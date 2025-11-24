@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,8 +8,8 @@
 // Don't compile this with any optimizations as it will likely have the useless mallocs
 // removed.
 
-uint64_t total_memory = 4L * 1024L * 1024L * 1024L; // -m
-int oom_seconds = 60;                               // -s
+uint64_t total_memory = 4ULL * 1024ULL * 1024ULL * 1024ULL; // -m
+int oom_seconds = 60;                                       // -s
 
 void usage()
 {
@@ -25,7 +26,7 @@ void parse_args(int argc, char **argv)
     switch (ch)
     {
     case 'm':
-      total_memory = atoll(optarg);
+      total_memory = strtoull(optarg, NULL, 10);
       break;
     case 's':
       oom_seconds = atoi(optarg);
@@ -42,13 +43,13 @@ void parse_args(int argc, char **argv)
 int main(int argc, char **argv)
 {
   parse_args(argc, argv);
-  printf("Attempting to allocate up to %llu bytes of memory in %d seconds.\n", total_memory, oom_seconds);
+  printf("Attempting to allocate up to %" PRIu64 " bytes of memory in %d seconds.\n", total_memory, oom_seconds);
 
   uint64_t mem_per_alloc = total_memory / oom_seconds;
-  printf("That equates to %llu bytes per allocation.\n", mem_per_alloc);
+  printf("That equates to %" PRIu64 " bytes per allocation.\n", mem_per_alloc);
   printf("Starting memory allocation loop...\n");
 
-  uint64_t allocated_memory = 0L;
+  uint64_t allocated_memory = 0ULL;
   for (int i = 0; i < oom_seconds; i++)
   {
     void *x = malloc(mem_per_alloc);
@@ -58,9 +59,8 @@ int main(int argc, char **argv)
       exit(1);
     }
     memset(x, 0, mem_per_alloc);
-
     allocated_memory += mem_per_alloc;
-    printf("  Iteration %d: %llu allocated / %llu total (at %p)\n", i + 1, allocated_memory, total_memory, x);
+    printf("  Iteration %d: %" PRIu64 " allocated / %" PRIu64 " total (at %p)\n", i + 1, allocated_memory, total_memory, x);
     sleep(1);
   }
 
