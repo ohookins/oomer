@@ -11,7 +11,7 @@ COPY noop.c .
 RUN gcc -static -O0 -o noop noop.c
 
 # Final stage for oomer
-FROM scratch
+FROM scratch AS oomer
 COPY --from=builder /oomer /oomer
 CMD ["/oomer"]
 
