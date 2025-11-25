@@ -11,6 +11,14 @@ jobs:
     permissions:
       contents: read
       packages: write
+    
+    strategy:
+      matrix:
+        include:
+          - image: oomer
+            target: oomer
+          - image: noop
+            target: noop
 
     steps:
       - name: Checkout repository
@@ -27,5 +35,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          target: ${{ matrix.target }}
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/oomer:latest
+          tags: ghcr.io/${{ github.repository_owner }}/oomer:${{ matrix.image }}

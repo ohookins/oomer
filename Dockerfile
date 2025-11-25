@@ -1,14 +1,21 @@
-# Use a minimal base image
-FROM alpine:latest
-
-# Install build tools
+# Builder stage
+FROM alpine:latest AS builder
 RUN apk add --no-cache gcc libc-dev
 
-# Copy the source code
+# Build oomer
 COPY main.c .
-
-# Compile the C program
 RUN gcc -static -O0 -o oomer main.c
 
-# Set the entrypoint for the container
-CMD ["./oomer"]
+# Build noop
+COPY noop.c .
+RUN gcc -static -O0 -o noop noop.c
+
+# Final stage for oomer
+FROM scratch
+COPY --from=builder /oomer /oomer
+CMD ["/oomer"]
+
+# Final stage for noop
+FROM scratch AS noop
+COPY --from=builder /noop /noop
+CMD ["/noop"]
