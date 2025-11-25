@@ -11,14 +11,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
-    strategy:
-      matrix:
-        include:
-          - image: oomer
-            target: oomer
-          - image: noop
-            target: noop
 
     steps:
       - name: Checkout repository
@@ -31,10 +23,17 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (oomer)
         uses: docker/build-push-action@v5
         with:
           context: .
-          target: ${{ matrix.target }}
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/oomer:${{ matrix.image }}
+          tags: ghcr.io/${{ github.repository_owner }}/oomer:latest
+
+      - name: Build and push Docker image (noop)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: noop
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/oomer:noop
