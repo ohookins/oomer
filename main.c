@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,6 +11,12 @@
 
 uint64_t total_memory = 4ULL * 1024ULL * 1024ULL * 1024ULL; // -m
 int oom_seconds = 60;                                       // -s
+
+void signal_handler(int signum)
+{
+  printf("\nCaught signal %d, exiting gracefully.\n", signum);
+  exit(0);
+}
 
 void usage()
 {
@@ -42,6 +49,9 @@ void parse_args(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+  signal(SIGINT, signal_handler);
+  signal(SIGTERM, signal_handler);
+
   parse_args(argc, argv);
   printf("Attempting to allocate up to %" PRIu64 " bytes of memory in %d seconds.\n", total_memory, oom_seconds);
 
